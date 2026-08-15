@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College of Health Professions Coin Flip Simulator</title>
+  <style>
+    :root {
+      --um-purple: #4a154b;
+      --um-purple-dark: #370d38;
+      --um-gold: #c59b27;
+      --um-gold-light: #fdf8eb;
+      --um-gold-border: #e6c875;
+      --bg-slate: #f7f6f9;
+      --card-bg: #ffffff;
+      --text-main: #2b1f2d;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-slate);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--um-purple);
+      border-radius: 12px;
+      padding: 20px 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 6px 16px rgba(74, 21, 75, 0.12);
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .logo-container {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .logo-container img {
+      max-width: 100%;
+      height: auto;
+      max-height: 70px;
+      object-fit: contain;
+    }
+
+    h2 {
+      margin: 0 0 16px 0;
+      color: var(--um-purple);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--um-purple);
+      text-transform: uppercase;
+    }
+
+    select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1.5px solid var(--um-purple);
+      background: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      font-weight: bold;
+    }
+
+    select:focus {
+      border-color: var(--um-gold);
+      box-shadow: 0 0 0 2px rgba(197, 155, 39, 0.25);
+    }
+
+    button {
+      width: 100%;
+      background: var(--um-purple);
+      color: #ffffff;
+      border: 2px solid var(--um-gold);
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 4px 0 16px 0;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--um-purple-dark);
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .stage {
+      perspective: 800px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90px;
+      margin-bottom: 14px;
+    }
+
+    .coin-3d {
+      width: 80px;
+      height: 80px;
+      position: relative;
+      transform-style: preserve-3d;
+      border-radius: 50%;
+    }
+
+    .coin-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      backface-visibility: hidden;
+      border: 3px solid var(--um-gold);
+      box-sizing: border-box;
+      box-shadow: 0 4px 10px rgba(74, 21, 75, 0.15);
+    }
+
+    .coin-heads {
+      background: var(--um-purple);
+      color: var(--um-gold);
+      transform: rotateY(0deg);
+    }
+
+    .coin-tails {
+      background: var(--um-gold);
+      color: var(--um-purple);
+      transform: rotateY(180deg);
+    }
+
+    .flipping {
+      animation: flip3d 2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes flip3d {
+      0% {
+        transform: translateY(0) rotateY(0deg) scale(1);
+      }
+      30% {
+        transform: translateY(-28px) rotateY(720deg) scale(1.15);
+      }
+      70% {
+        transform: translateY(-10px) rotateY(1440deg) scale(1.05);
+      }
+      100% {
+        transform: translateY(0) rotateY(var(--target-rotation, 1800deg)) scale(1);
+      }
+    }
+
+    .results-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 8px;
+      background: #faf9fb;
+      border: 1px dashed var(--um-purple);
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .badge-item {
+      min-width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      box-sizing: border-box;
+      animation: pop 0.15s ease-out;
+    }
+
+    .badge-h {
+      background: var(--um-purple);
+      color: #ffffff;
+      border: 1px solid var(--um-gold);
+    }
+
+    .badge-t {
+      background: var(--um-gold-light);
+      color: var(--um-purple);
+      border: 1.5px solid var(--um-purple);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      100% { transform: scale(1); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--um-gold-light);
+      border: 1px solid var(--um-gold-border);
+      border-radius: 8px;
+      padding: 10px 4px;
+      gap: 4px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--um-purple);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--um-purple);
+      margin-top: 2px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--um-purple-dark);
+      margin-top: 1px;
+    }
+
+    .reset-btn {
+      margin-top: 10px;
+      background: transparent;
+      border: none;
+      color: var(--um-purple);
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .reset-btn:hover {
+      color: var(--um-purple-dark);
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo-container">
+    <img src="CHP.png" alt="University of Montevallo College of Health Professions">
+  </div>
+  
+  <h2>Coin Flip Simulator</h2>
+
+  <div class="input-row">
+    <label for="numFlips">Flips per Roll:</label>
+    <select id="numFlips">
+      <option value="1" selected>1 Flip</option>
+      <option value="2">2 Flips</option>
+      <option value="3">3 Flips</option>
+      <option value="4">4 Flips</option>
+      <option value="5">5 Flips</option>
+      <option value="10">10 Flips</option>
+      <option value="15">15 Flips</option>
+      <option value="20">20 Flips</option>
+    </select>
+  </div>
+
+  <div class="stage">
+    <div class="coin-3d" id="mainCoin">
+      <div class="coin-face coin-heads">H</div>
+      <div class="coin-face coin-tails">T</div>
+    </div>
+  </div>
+
+  <button type="button" id="flipBtn">Flip Coin</button>
+
+  <div class="results-container" id="resultsDisplay">
+    <span style="color:#777; font-size:12px; margin-top:6px;">Current batch outcomes will appear here</span>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-label">Total Flips</div>
+      <div class="stat-val" id="totalFlips">0</div>
+      <div class="stat-sub">100%</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Heads (H)</div>
+      <div class="stat-val" id="totalHeads">0</div>
+      <div class="stat-sub" id="pctHeads">0.0%</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Tails (T)</div>
+      <div class="stat-val" id="totalTails">0</div>
+      <div class="stat-sub" id="pctTails">0.0%</div>
+    </div>
+  </div>
+
+  <button type="button" class="reset-btn" id="resetBtn">Reset Running Totals</button>
+</div>
+
+<script>
+  var runningHeads = 0;
+  var runningTails = 0;
+  var isAnimating = false;
+
+  function handleFlip() {
+    if (isAnimating) return;
+
+    var count = parseInt(document.getElementById("numFlips").value, 10);
+    var btn = document.getElementById("flipBtn");
+    var coin = document.getElementById("mainCoin");
+    var display = document.getElementById("resultsDisplay");
+
+    isAnimating = true;
+    btn.disabled = true;
+    btn.textContent = "Flipping (2s)...";
+
+    var batchOutcomes = [];
+    for (var i = 0; i < count; i++) {
+      batchOutcomes.push(Math.random() < 0.5 ? "H" : "T");
+    }
+
+    var finalFace = batchOutcomes[batchOutcomes.length - 1];
+    var targetRotation = (finalFace === "H") ? 1800 : 1980;
+
+    coin.style.setProperty("--target-rotation", targetRotation + "deg");
+    coin.classList.remove("flipping");
+    void coin.offsetWidth;
+    coin.classList.add("flipping");
+
+    setTimeout(function() {
+      display.innerHTML = "";
+
+      for (var j = 0; j < batchOutcomes.length; j++) {
+        var outcome = batchOutcomes[j];
+        if (outcome === "H") {
+          runningHeads++;
+        } else {
+          runningTails++;
+        }
+
+        var badge = document.createElement("div");
+        badge.className = "badge-item " + (outcome === "H" ? "badge-h" : "badge-t");
+        badge.textContent = outcome;
+        display.appendChild(badge);
+      }
+
+      var total = runningHeads + runningTails;
+      var hPct = ((runningHeads / total) * 100).toFixed(1);
+      var tPct = ((runningTails / total) * 100).toFixed(1);
+
+      document.getElementById("totalFlips").textContent = total;
+      document.getElementById("totalHeads").textContent = runningHeads;
+      document.getElementById("pctHeads").textContent = hPct + "%";
+      document.getElementById("totalTails").textContent = runningTails;
+      document.getElementById("pctTails").textContent = tPct + "%";
+
+      btn.disabled = false;
+      btn.textContent = "Flip Coin";
+      isAnimating = false;
+    }, 2000);
+  }
+
+  function resetStats() {
+    if (isAnimating) return;
+    runningHeads = 0;
+    runningTails = 0;
+    document.getElementById("totalFlips").textContent = "0";
+    document.getElementById("totalHeads").textContent = "0";
+    document.getElementById("pctHeads").textContent = "0.0%";
+    document.getElementById("totalTails").textContent = "0";
+    document.getElementById("pctTails").textContent = "0.0%";
+    document.getElementById("resultsDisplay").innerHTML = '<span style="color:#777; font-size:12px; margin-top:6px;">Current batch outcomes will appear here</span>';
+  }
+
+  document.getElementById("flipBtn").onclick = handleFlip;
+  document.getElementById("resetBtn").onclick = resetStats;
+</script>
+
+</body>
+</html>
